@@ -63,3 +63,6 @@ forgot to add, npx install pg bcryptjs jsonwebtoken zod
 - The craziest thing, is change the fetch from like /api/auth/register to `${process.env.NEXT_PUBLIC_API_URL}/login`.
 - Backend logic here is that NextJS using Laravel internal server (port) that hosting on 8000, then ~/login logic from Laravel php folder that contains the connection of DB
 - Run in two terminals. One for NextJS and one for Laravel OR you can use docker to make container and image of Laravel. TM ts is easy
+
+#TF, forgor to put in how to connect DB
+just fricking turn the Laragon or run your docker image -_-
