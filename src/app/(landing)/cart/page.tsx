@@ -29,20 +29,23 @@ export default function Cart() {
   const loadCartItems = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        router.push('/login');
+      let response;
+      if (token) {
+        response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+      } else {
+        // Guest cart fallback: get from localStorage
+        const guestCart = JSON.parse(localStorage.getItem('guest_cart') || '[]');
+        setCartItems(guestCart);
+        setIsLoading(false);
         return;
       }
-
-      const response = await fetch('/api/cart', {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-
       if (response.ok) {
         const data = await response.json();
         setCartItems(data.cartItems);
       } else if (response.status === 401) {
-        router.push('/login');
+        setCartItems([]);
       } else {
         setError('Failed to load cart items');
       }
@@ -59,53 +62,69 @@ export default function Cart() {
   }, [loadCartItems]);
 
   const updateQuantity = async (cartItemId: number, newQuantity: number) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      const response = await fetch(`/api/cart/${cartItemId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ quantity: newQuantity }),
-      });
-
-      if (response.ok) {
-        if (newQuantity === 0) {
-          setCartItems(items => items.filter(item => item.id !== cartItemId));
-        } else {
-          const data = await response.json();
-          setCartItems(items => 
-            items.map(item => 
-              item.id === cartItemId ? data.cartItem : item
-            )
-          );
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart/${cartItemId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ quantity: newQuantity }),
+        });
+        if (response.ok) {
+          if (newQuantity === 0) {
+            setCartItems(items => items.filter(item => item.id !== cartItemId));
+          } else {
+            const data = await response.json();
+            setCartItems(items =>
+              items.map(item =>
+                item.id === cartItemId ? data.cartItem : item
+              )
+            );
+          }
         }
+      } catch (error) {
+        console.error('Error updating quantity:', error);
       }
-    } catch (error) {
-      console.error('Error updating quantity:', error);
+    } else {
+      // Guest cart update
+      let guestCart = JSON.parse(localStorage.getItem('guest_cart') || '[]');
+      if (newQuantity === 0) {
+        guestCart = guestCart.filter((item: any) => item.id !== cartItemId);
+      } else {
+        guestCart = guestCart.map((item: any) =>
+          item.id === cartItemId ? { ...item, quantity: newQuantity } : item
+        );
+      }
+      localStorage.setItem('guest_cart', JSON.stringify(guestCart));
+      setCartItems(guestCart);
     }
   };
 
   const removeItem = async (cartItemId: number) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      const response = await fetch(`/api/cart/${cartItemId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        setCartItems(items => items.filter(item => item.id !== cartItemId));
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart/${cartItemId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          setCartItems(items => items.filter(item => item.id !== cartItemId));
+        }
+      } catch (error) {
+        console.error('Error removing item:', error);
       }
-    } catch (error) {
-      console.error('Error removing item:', error);
+    } else {
+      // Guest cart remove
+      let guestCart = JSON.parse(localStorage.getItem('guest_cart') || '[]');
+      guestCart = guestCart.filter((item: any) => item.id !== cartItemId);
+      localStorage.setItem('guest_cart', JSON.stringify(guestCart));
+      setCartItems(guestCart);
     }
   };
 
@@ -300,7 +319,7 @@ export default function Cart() {
                     color: '#9c634f', 
                     fontSize: '16px', 
                     fontWeight: 700, 
-                    margin: '0 0 8px 0' 
+                    margin: 0 
                   }}>
                     {formatCurrency(item.product.price * item.quantity)}
                   </p>

@@ -30,7 +30,7 @@ export default function Register() {
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -351,7 +351,7 @@ export default function Register() {
             textDecoration: 'none', 
             fontSize: '14px' 
           }}>
-            ← Back to home
+            Back to home
           </Link>
         </div>
       </div>

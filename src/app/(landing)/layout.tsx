@@ -95,9 +95,13 @@ function Navbar() {
 
           {/* Navbar 3: Cart + Auth */}
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", alignItems: "center" }}>
-            <button aria-label="Cart" style={{ background: "#f0d7a7", border: "1px solid #e6c98c", color: "#894e3f", padding: "10px 12px", borderRadius: 10, cursor: "pointer" }}>
-              <span style={{ fontSize: 18 }}>🛒</span>
-            </button>
+            <Link href="/cart" style={{ color: "#894e3f", textDecoration: "none", 
+              // fontWeight: 600, padding: "6px 8px", letterSpacing: 1 
+              }}>
+              <button aria-label="Cart" style={{ background: "#f0d7a7", border: "1px solid #e6c98c", color: "#894e3f", padding: "10px 12px", borderRadius: 10, cursor: "pointer" }}>
+                <span style={{ fontSize: 18 }}>🛒</span>
+              </button>
+            </Link>
             <Link href="/login" style={{ color: "#894e3f", textDecoration: "none", fontWeight: 600, padding: "6px 8px", letterSpacing: 1 }}>Login</Link>
             <Link href="/register" style={{ color: "#9c634f", textDecoration: "none", background: "#fff", border: "1px solid #f0d7a7", padding: "10px 14px", borderRadius: 10, fontWeight: 600, letterSpacing: 1 }}>Signup</Link>
           </div>
@@ -140,24 +144,30 @@ export default function LandingLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Detect current route to hide search bar on login/register
+  const isAuthPage = typeof window !== 'undefined' &&
+    (window.location.pathname.startsWith('/login') || window.location.pathname.startsWith('/register'));
+
   return (
     <html lang="en">
       <body style={{ background: "#fffaf2", margin: 0, fontFamily: "HyliliangHeiJ, sans-serif" }}>
         <Navbar />
         {/* Search bar below navbar - no background */}
-        <div id="home" style={{ scrollMarginTop: 80, paddingTop: "60px" }}>
-          <div style={{ maxWidth: 900, margin: "24px auto 16px auto", padding: "0 24px" }}>
-            <input
-              type="search"
-              placeholder="Search pastries, breads, cakes..."
-              onChange={(e) => {
-                const q = e.currentTarget.value;
-                window.dispatchEvent(new CustomEvent("bc:search", { detail: q }));
-              }}
-              style={{ width: "100%", padding: "14px 18px", borderRadius: 999, border: "1px solid #e6c98c", outline: "none", color: "#7a4a3d", letterSpacing: 0.5, background: "#fff", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
-            />
+        {!isAuthPage && (
+          <div id="home" style={{ scrollMarginTop: 80, paddingTop: "60px" }}>
+            <div style={{ maxWidth: 900, margin: "24px auto 16px auto", padding: "0 24px" }}>
+              <input
+                type="search"
+                placeholder="Search pastries, breads, cakes..."
+                onChange={(e) => {
+                  const q = e.currentTarget.value;
+                  window.dispatchEvent(new CustomEvent("bc:search", { detail: q }));
+                }}
+                style={{ width: "100%", padding: "14px 18px", borderRadius: 999, border: "1px solid #e6c98c", outline: "none", color: "#7a4a3d", letterSpacing: 0.5, background: "#fff", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}
+              />
+            </div>
           </div>
-        </div>
+        )}
         {children}
         <Footer />
       </body>
