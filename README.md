@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Setup NextJS (npm, npx, packages)
+- node -v (I'm using v22.19.0, didn't test if works on lower version or conflict any dependencies)
+- npm -v and npx -v (both version should be the same)
 
-## Getting Started
+Note: You don't need to make new build project using npx create-next-app@latest [project_name], cuz' I've settled what to use on this project
 
-First, run the development server:
+## Setup PHP artisan + API integration NextJS from Laravel
+- php -v (check if php version still lower than 8.3), make sure to get latest packages from PHP: https://www.php.net/downloads.php
+- composer --version (update to latest, latest version 2.8.12), using composer self-update to update.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### If done, then start run it:
+- php artisan serve (it would show up localhost running on 8000, by default, it's Laravel port)
+- copy the port URL => nextjs-project/.env/ => if .env wasn't found, that's because I used prisma for Backend Logic NextJS (just create it manual) => make NEXT_PUBLIC_API_URL variable and paste the port URL into it.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### After following all those steps, go to nextjs/src/app/(landing). I still progressing to make Guest User, but just go to /login/page.tsx
+- The first thing you'll see would be this part:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+      export default function Login() {
+        const [formData, setFormData] = useState({
+          email: '',
+          password: '',
+        });
+        const [isLoading, setIsLoading] = useState(false);
+        const [error, setError] = useState('');
+        const router = useRouter();
+      
+        const handleSubmit = async (e: React.FormEvent) => {
+          e.preventDefault();
+          setIsLoading(true);
+          setError('');
+      
+          try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              },
+              body: JSON.stringify(formData),
+            });
+      
+            const data = await response.json();
+      
+            if (response.ok) {
+              // Store token in localStorage
+              localStorage.setItem('token', data.token);
+              localStorage.setItem('user', JSON.stringify(data.user));
+              
+              // Redirect to home
+              router.push('/');
+            } else {
+              setError(data.error || 'Login failed');
+            }
+          } catch (error) {
+            console.error(error);
+            setError('An error occurred. Please try again.');
+          } finally {
+            setIsLoading(false);
+          }
+        };
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The craziest thing, is change the fetch from like /api/auth/register to `${process.env.NEXT_PUBLIC_API_URL}/login`.
+- Backend logic here is that NextJS using Laravel internal server (port) that hosting on 8000, then ~/login logic from Laravel php folder that contains the connection of DB
