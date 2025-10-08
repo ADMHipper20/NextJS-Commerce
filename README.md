@@ -3,6 +3,7 @@
 - npm -v and npx -v (both version should be the same)
 
 Note: You don't need to make new build project using npx create-next-app@latest [project_name], cuz' I've settled what to use on this project
+forgot to add, npx install pg bcryptjs jsonwebtoken zod
 
 ## Setup PHP artisan + API integration NextJS from Laravel
 - php -v (check if php version still lower than 8.3), make sure to get latest packages from PHP: https://www.php.net/downloads.php
