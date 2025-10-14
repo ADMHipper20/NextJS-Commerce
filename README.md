@@ -1,17 +1,21 @@
-## Setup NextJS (npm, npx, packages)
-- node -v (I'm using v22.19.0, didn't test if works on lower version or conflict any dependencies)
-- npm -v and npx -v (both version should be the same)
+## 1. Setup NextJS (npm, npx, packages)
+- **node -v** (I'm using v22.19.0, didn't test if works on lower version or conflict any dependencies)
+- **npm -v** and **npx -v** (both version should be the same)
+
+### How to run NextJS:
+- **npm run dev**, it'll automatically just run and go to its localhost:3000
 
 Note: You don't need to make new build project using npx create-next-app@latest [project_name], cuz' I've settled what to use on this project
-forgot to add, npx install pg bcryptjs jsonwebtoken zod
+forgot to add, **npx install pg bcryptjs jsonwebtoken zod**
 
-## Setup PHP artisan + API integration NextJS from Laravel
-- php -v (check if php version still lower than 8.3), make sure to get latest packages from PHP: https://www.php.net/downloads.php
-- composer --version (update to latest, latest version 2.8.12), using composer self-update to update.
+## 2. Setup PHP artisan + API integration NextJS from Laravel
+- **php -v** (check if php version still lower than 8.3), make sure to get latest packages from PHP: https://www.php.net/downloads.php
+- **composer --version** (update to latest, latest version 2.8.12), using **composer self-update** to update.
 
-### If done, then start run it:
-- php artisan serve (it would show up localhost running on 8000, by default, it's Laravel port)
-- copy the port URL => nextjs-project/.env/ => if .env wasn't found, that's because I used prisma for Backend Logic NextJS (just create it manual) => make NEXT_PUBLIC_API_URL variable and paste the port URL into it.
+### How to run PHP Artisan:
+_If done, then start run it:_
+- **php artisan serve** (it would show up localhost running on 8000, by default, it's Laravel port)
+- copy the **PHP port URL** => nextjs-project/.env/ => if .env wasn't found, that's because I used prisma for Backend Logic NextJS (just create it manual) => make **NEXT_PUBLIC_API_URL variable** and paste the port URL into it.
 
 ### After following all those steps, go to nextjs/src/app/(landing). I still progressing to make Guest User, but just go to /login/page.tsx
 - The first thing you'll see would be this part:
@@ -60,9 +64,8 @@ forgot to add, npx install pg bcryptjs jsonwebtoken zod
           }
         };
 
-- The craziest thing, is change the fetch from like /api/auth/register to `${process.env.NEXT_PUBLIC_API_URL}/login`.
+- The craziest thing, is change the fetch from like **/api/auth/~** to `${process.env.NEXT_PUBLIC_API_URL}/login`.
 - Backend logic here is that NextJS using Laravel internal server (port) that hosting on 8000, then ~/login logic from Laravel php folder that contains the connection of DB
 - Run in two terminals. One for NextJS and one for Laravel OR you can use docker to make container and image of Laravel. TM ts is easy
 
-#TF, forgor to put in how to connect DB
-just fricking turn the Laragon or run your docker image -_-
+# CONGRATS, YOU FINISHED ALL THE SETUP. YOU CAN RUN YOUR LARAGO OR DOCKER DESKTOP FOR DB
