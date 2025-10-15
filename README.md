@@ -68,4 +68,9 @@ _If done, then start run it:_
 - Backend logic here is that NextJS using Laravel internal server (port) that hosting on 8000, then ~/login logic from Laravel php folder that contains the connection of DB
 - Run in two terminals. One for NextJS and one for Laravel OR you can use docker to make container and image of Laravel. TM ts is easy
 
+# If you wonder about .env I made. . .
+      DATABASE_URL="prisma+postgres://localhost:51213/?api_key={THIS ONE ONLY IF YOU USE PRISMA"
+      NEXT_PUBLIC_API_URL="http://localhost:8000/api"
+Note: BY USING NPX PRISMA INIT => NPX PRISMA MIGRATE DEV, It'll generate key, but since Laravel integrated with the frontend, there are no casualities.
+
 # CONGRATS, YOU FINISHED ALL THE SETUP. YOU CAN RUN YOUR LARAGO OR DOCKER DESKTOP FOR DB
